@@ -9,14 +9,19 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::with('user')
+        $posts = Post::with('user')
             ->where('is_draft', false)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
             ->paginate(20);
 
         return response()->json([
-            'posts' => $post,
+            'data' => $posts->items(),
+            'meta' => [
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'total' => $posts->total(),
+            ],
         ]);
     }
 
