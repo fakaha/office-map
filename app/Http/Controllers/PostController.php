@@ -9,7 +9,11 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::select('id', 'id', 'user_id', 'title', 'content', 'created_at', 'updated_at')->paginate(20);
+        $post = Post::with('user')
+            ->where('is_draft', false)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->paginate(20);
 
         return response()->json([
             'posts' => $post,
@@ -18,7 +22,7 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('posts.create');
+        return 'posts.create';
     }
 
     public function store(Request $request)
@@ -43,7 +47,7 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
 
-        if ($post->is_draft == 1) {
+        if ($post->is_draft || $post->published_at > now()) {
             abort(404);
         }
 
@@ -58,7 +62,7 @@ class PostController extends Controller
 
         $data['post'] = $post;
 
-        return view('posts.edit', $data);
+        return 'posts.edit';
     }
 
     public function update(Request $request, Post $post)
