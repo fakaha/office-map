@@ -16,12 +16,7 @@ class PostController extends Controller
             ->paginate(20);
 
         return response()->json([
-            'data' => $posts->items(),
-            'meta' => [
-                'current_page' => $posts->currentPage(),
-                'last_page' => $posts->lastPage(),
-                'total' => $posts->total(),
-            ],
+            'posts' => $posts,
         ]);
     }
 
